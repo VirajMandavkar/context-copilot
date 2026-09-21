@@ -2,8 +2,8 @@
 
 import { activateLicense, deactivateLicense, getLicenseState, isProUser } from '../license/engine.js';
 
-// Default placeholder checkout URL — will be replaced by user's actual Lemon Squeezy store link
-export const LEMON_CHECKOUT_URL = 'https://contextcopilot.lemonsqueezy.com/checkout';
+// Real Lemon Squeezy checkout URL
+export const LEMON_CHECKOUT_URL = 'https://contextcopilot.lemonsqueezy.com/checkout/buy/23ba4e51-5e33-4f1b-8efd-81f27e2d4a2c';
 
 /**
  * Open the Pro Upgrade / License Management modal.
