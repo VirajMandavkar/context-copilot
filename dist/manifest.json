@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Context Copilot",
+  "version": "0.1.0",
+  "description": "Capture, tag, and inject conversational context into AI chat interfaces.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://api.lemonsqueezy.com/*"
+  ],
+  "action": {
+    "default_title": "Toggle Context Copilot Sidebar"
+  },
+  "commands": {
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Alt+Shift+C",
+        "mac": "MacCtrl+Shift+C"
+      },
+      "description": "Toggle Context Copilot Sidebar"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "*://*/*"
+      ],
+      "js": ["content.js"],
+      "css": [],
+      "run_at": "document_idle"
+    }
+  ]
+}
