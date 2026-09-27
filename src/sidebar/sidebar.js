@@ -139,9 +139,14 @@ export function injectSidebar() {
   hostElement = document.createElement('div');
   hostElement.id = 'cc-sidebar-host';
   
-  // SPEC-11: Closed Shadow DOM
-  shadowRoot = hostElement.attachShadow({ mode: 'closed' });
+  // SPEC-11: Open Shadow DOM (so internal scripts can query it)
+  shadowRoot = hostElement.attachShadow({ mode: 'open' });
   
+  // Prevent host page from reacting to extension interactions
+  ['click', 'mousedown', 'mouseup', 'keydown', 'keyup', 'keypress'].forEach(evt => {
+    hostElement.addEventListener(evt, (e) => e.stopPropagation());
+  });
+
   const style = document.createElement('style');
   style.textContent = SIDEBAR_CSS;
   shadowRoot.appendChild(style);
