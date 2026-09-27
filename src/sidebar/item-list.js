@@ -645,10 +645,20 @@ export function renderItemList(container, sessionState) {
       arrow.style.fontSize = '10px';
       arrow.style.color = '#36d6b5';
 
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = true;
+      checkbox.className = 'cc-group-inject-checkbox';
+      checkbox.dataset.group = grp.key;
+      checkbox.title = 'Include this group when injecting context';
+      checkbox.style.cursor = 'pointer';
+      // Prevent accordion toggle when clicking checkbox
+      checkbox.addEventListener('click', (e) => e.stopPropagation());
+
       const title = document.createElement('span');
       title.textContent = grp.name;
 
-      leftPart.append(arrow, title);
+      leftPart.append(arrow, checkbox, title);
 
       const count = document.createElement('span');
       count.className = 'cc-accordion-count';
@@ -714,5 +724,24 @@ export function renderItemList(container, sessionState) {
     // Flat rendering when filtered to a specific group or no groups exist
     filteredItems.forEach(item => renderCard(item, container));
   }
+}
+
+export function getCheckedGroups() {
+  const host = document.getElementById('cc-sidebar-host');
+  if (!host || !host.shadowRoot) return null;
+
+  const container = host.shadowRoot.getElementById('cc-item-container');
+  if (!container) return null; // No UI rendered
+
+  const checkboxes = container.querySelectorAll('.cc-group-inject-checkbox');
+  if (checkboxes.length === 0) return null; // Flat view or no groups
+
+  const selected = [];
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      selected.push(cb.dataset.group.toLowerCase());
+    }
+  });
+  return selected;
 }
 

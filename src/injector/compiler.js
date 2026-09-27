@@ -88,6 +88,15 @@ export function compileContext(sessionState, options = {}) {
     items = items.filter(i => i.tag.toLowerCase() === targetTag);
   }
 
+  // Filter by checked checkboxes (if we are not scoping to a single group via dropdown)
+  if (!targetGroup && Array.isArray(options.checkedGroups)) {
+    const checkedSet = new Set(options.checkedGroups);
+    items = items.filter(i => {
+      const g = (i.group || 'ungrouped').trim().toLowerCase();
+      return checkedSet.has(g);
+    });
+  }
+
   if (items.length === 0) {
     return '';
   }

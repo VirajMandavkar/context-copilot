@@ -9,7 +9,7 @@ import { toggleSidebar, closeSidebar, isSidebarOpen, getSidebarElements, onSideb
 import { initEdgeHandle, updateEdgeHandleCount, setEdgeHandleOpen } from './src/sidebar/edge-handle.js';
 import { setupFilterUI } from './src/sidebar/filter.js';
 import { setupManualInputUI } from './src/sidebar/manual-input.js';
-import { renderItemList, getActiveTagFilter, getActiveGroupFilter, setActiveGroupFilter } from './src/sidebar/item-list.js';
+import { renderItemList, getActiveTagFilter, getActiveGroupFilter, setActiveGroupFilter, getCheckedGroups } from './src/sidebar/item-list.js';
 import { setupSessionUI } from './src/sidebar/session.js';
 
 import { compileContext } from './src/injector/compiler.js';
@@ -259,7 +259,8 @@ function wireSidebar(threadId, sessionId) {
 
       const tagFilter = getActiveTagFilter();
       const groupFilter = getActiveGroupFilter();
-      const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter });
+      const checkedGroups = getCheckedGroups();
+      const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter, checkedGroups });
       if (!markdown) return;
 
       try {
@@ -294,14 +295,6 @@ function wireSidebar(threadId, sessionId) {
     newBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       if (!currentSessionId) return;
-
-      const guard = await canUseGrouping();
-      if (!guard.allowed) {
-        if (elements.container) {
-          openProModal(elements.container, guard.reason);
-        }
-        return;
-      }
 
       const name = prompt('Enter new group name (e.g. Frontend UI, Go Proxy, Auth):');
       if (!name || !name.trim()) return;
@@ -466,7 +459,8 @@ function wireSidebar(threadId, sessionId) {
 
       const tagFilter = getActiveTagFilter();
       const groupFilter = getActiveGroupFilter();
-      const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter });
+      const checkedGroups = getCheckedGroups();
+      const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter, checkedGroups });
       if (!markdown) return;
 
       const inputEl = findInputElement();
