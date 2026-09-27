@@ -1,6 +1,4 @@
 import { getSessionIndex, linkThreadToSession, renameSession, createAndLinkSessionForThread, deleteSession } from '../storage/engine.js';
-import { canCreateSession } from '../license/guard.js';
-import { openProModal } from './pro-modal.js';
 
 export async function setupSessionUI(threadId, elements, currentSessionId, onSessionChanged) {
   const { sessionTrigger, sessionMenu, newSessionBtn, editSessionBtn } = elements;
@@ -132,17 +130,13 @@ export async function setupSessionUI(threadId, elements, currentSessionId, onSes
       e.preventDefault();
       toggleMenu(false);
 
-      const curIndex = await getSessionIndex();
-      const sessionCount = Object.keys(curIndex.sessions || {}).length;
-      const guard = await canCreateSession(sessionCount);
-      if (!guard.allowed) {
-        const container = sessionTrigger.closest('.cc-sidebar') || document.body;
-        openProModal(container, guard.reason);
-        return;
+      newSessionRow.style.pointerEvents = 'none';
+      try {
+        const { sessionId } = await createAndLinkSessionForThread(threadId, window.location.href);
+        onSessionChanged(sessionId);
+      } finally {
+        newSessionRow.style.pointerEvents = 'auto';
       }
-
-      const { sessionId } = await createAndLinkSessionForThread(threadId, window.location.href);
-      onSessionChanged(sessionId);
     });
     sessionMenu.appendChild(newSessionRow);
   }
@@ -154,17 +148,13 @@ export async function setupSessionUI(threadId, elements, currentSessionId, onSes
     e.preventDefault();
     toggleMenu(false);
 
-    const curIndex = await getSessionIndex();
-    const sessionCount = Object.keys(curIndex.sessions || {}).length;
-    const guard = await canCreateSession(sessionCount);
-    if (!guard.allowed) {
-      const container = sessionTrigger.closest('.cc-sidebar') || document.body;
-      openProModal(container, guard.reason);
-      return;
+    newSessionBtn.style.pointerEvents = 'none';
+    try {
+      const { sessionId } = await createAndLinkSessionForThread(threadId, window.location.href);
+      onSessionChanged(sessionId);
+    } finally {
+      newSessionBtn.style.pointerEvents = 'auto';
     }
-
-    const { sessionId } = await createAndLinkSessionForThread(threadId, window.location.href);
-    onSessionChanged(sessionId);
   });
 
   // Rename session

@@ -95,6 +95,7 @@ describe('DOM Tooltip Module (SPEC-7, 8, 9, 10)', () => {
       const btn = host.shadowRoot.querySelectorAll('button')[0];
       btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       
+      await new Promise(r => setTimeout(r, 0));
       expect(document.getElementById('cc-tooltip-host')).toBeNull();
     });
   });

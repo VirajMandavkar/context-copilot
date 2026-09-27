@@ -27,29 +27,21 @@ describe('injectContentEditable (SPEC-18)', () => {
     execSpy.mockRestore();
   });
 
-  it('falls back to InputEvent dispatch if execCommand returns false', async () => {
+  it('falls back to Paste event dispatch if execCommand returns false', async () => {
     vi.spyOn(document, 'execCommand').mockReturnValue(false);
 
-    const inputHandler = vi.fn();
-    const beforeInputHandler = vi.fn();
-    div.addEventListener('input', inputHandler);
-    div.addEventListener('beforeinput', beforeInputHandler);
+    const pasteHandler = vi.fn();
+    div.addEventListener('paste', pasteHandler);
 
     await injectContentEditable(div, 'Fallback text');
 
-    expect(beforeInputHandler).toHaveBeenCalled();
-    expect(inputHandler).toHaveBeenCalled();
+    expect(pasteHandler).toHaveBeenCalled();
 
-    // Verify InputEvent properties
-    const beforeInputEvent = beforeInputHandler.mock.calls[0][0];
-    expect(beforeInputEvent.inputType).toBe('insertText');
-    expect(beforeInputEvent.data).toBe('Fallback text');
-    expect(beforeInputEvent.bubbles).toBe(true);
-
-    const inputEvent = inputHandler.mock.calls[0][0];
-    expect(inputEvent.inputType).toBe('insertText');
-    expect(inputEvent.data).toBe('Fallback text');
-    expect(inputEvent.bubbles).toBe(true);
+    // Verify ClipboardEvent properties
+    const pasteEvent = pasteHandler.mock.calls[0][0];
+    expect(pasteEvent.type).toBe('paste');
+    expect(pasteEvent.bubbles).toBe(true);
+    expect(pasteEvent.clipboardData.getData('text/plain')).toBe('Fallback text');
 
     document.execCommand.mockRestore();
   });

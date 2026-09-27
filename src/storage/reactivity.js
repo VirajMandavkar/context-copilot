@@ -16,12 +16,12 @@ export function startStorageReactivity(sessionId, onStateChanged) {
   stopStorageReactivity();
 
   const targetKey = 'cc_session:' + sessionId;
-  console.log(`[ContextCopilot] Reactivity started for ${targetKey}`);
+  console.log('[ContextCopilot] Reactivity started for', targetKey);
 
   currentListener = (changes, areaName) => {
     if (areaName === 'local') {
       if (changes[targetKey]) {
-        console.log(`[ContextCopilot] Storage changed for ${targetKey}:`, changes[targetKey]);
+        console.log('[ContextCopilot] Storage changed for', targetKey, ':', changes[targetKey]);
         const newValue = changes[targetKey].newValue || null;
         console.log('[ContextCopilot] Triggering UI render with new state');
         onStateChanged(newValue);

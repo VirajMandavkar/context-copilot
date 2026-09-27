@@ -4,7 +4,7 @@
 const INDEX_KEY = 'cc_session_index';
 const SESSION_PREFIX = 'cc_session:';
 
-import { canAddItem } from '../license/guard.js';
+
 
 // SPEC-2: Valid tags
 const VALID_TAGS = new Set(['decision', 'constraint', 'task', 'note']);
@@ -270,11 +270,6 @@ export async function addItem(sessionId, itemData) {
   if (!state.items) state.items = [];
   if (!state.groups) state.groups = [];
   if (!index.sessions) index.sessions = {};
-
-  const guard = await canAddItem(state.items.length);
-  if (!guard.allowed) {
-    throw new Error(guard.reason);
-  }
 
   // Auto-register group name if it's new and not already in state.groups
   if (item.group && !state.groups.some(g => g.toLowerCase() === item.group.toLowerCase())) {

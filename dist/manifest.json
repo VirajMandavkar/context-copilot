@@ -9,7 +9,6 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "https://api.lemonsqueezy.com/*"
   ],
   "action": {
     "default_title": "Toggle Context Copilot Sidebar"

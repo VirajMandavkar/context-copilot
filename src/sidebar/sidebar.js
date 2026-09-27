@@ -2,8 +2,6 @@
 // Implements: SPEC-11 (Sidebar shell, toggle, isolation)
 
 import { setActiveTagFilter } from './item-list.js';
-import { openProModal } from './pro-modal.js';
-import { isProUserSync, onLicenseChange, validateLicense } from '../license/engine.js';
 
 const SIDEBAR_CSS = `
   :host {
@@ -170,47 +168,7 @@ export function injectSidebar() {
   title.style.webkitBackgroundClip = 'text';
   title.style.webkitTextFillColor = 'transparent';
 
-  const proBadge = document.createElement('button');
-  proBadge.id = 'cc-pro-badge';
-  proBadge.textContent = 'Upgrade';
-  proBadge.style.fontSize = '10px';
-  proBadge.style.fontWeight = '600';
-  proBadge.style.padding = '2px 6px';
-  proBadge.style.marginLeft = '8px';
-  proBadge.style.borderRadius = '10px';
-  proBadge.style.background = 'rgba(54, 214, 181, 0.12)';
-  proBadge.style.color = '#36d6b5';
-  proBadge.style.border = '1px solid rgba(54, 214, 181, 0.25)';
-  proBadge.style.cursor = 'pointer';
-  proBadge.title = 'Context Copilot Pro License';
-
-  function updateProBadge() {
-    const isPro = isProUserSync();
-    if (isPro) {
-      proBadge.textContent = 'PRO ✓';
-      proBadge.style.background = '#2e7d32';
-      proBadge.style.color = '#fff';
-      proBadge.style.borderColor = '#4caf50';
-      proBadge.title = 'Context Copilot Pro Active';
-    } else {
-      proBadge.textContent = 'Upgrade';
-      proBadge.style.background = 'rgba(54, 214, 181, 0.12)';
-      proBadge.style.color = '#36d6b5';
-      proBadge.style.borderColor = 'rgba(54, 214, 181, 0.25)';
-      proBadge.title = 'Upgrade to Pro';
-    }
-  }
-
-  proBadge.addEventListener('click', () => {
-    openProModal(container);
-  });
-
-  onLicenseChange(() => updateProBadge());
-  validateLicense().then(() => updateProBadge());
-  updateProBadge();
-
   titleRow.appendChild(title);
-  titleRow.appendChild(proBadge);
   
   const copyBtn = document.createElement('button');
   copyBtn.id = 'cc-copy-btn';

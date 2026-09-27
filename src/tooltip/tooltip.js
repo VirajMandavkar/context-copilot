@@ -2,7 +2,6 @@
 // Implements: SPEC-7, 8, 9, 10
 
 import { addItem } from '../storage/engine.js';
-import { openProModal } from '../sidebar/pro-modal.js';
 // We'd normally import CSS as a string, but for MVP without a bundler plugin,
 // we'll inject standard raw CSS text directly.
 const TOOLTIP_CSS = `
@@ -54,41 +53,37 @@ function buildTooltipDOM() {
       e.preventDefault();
       console.log('[ContextCopilot] TOOLTIP BUTTON CLICKED:', tagStr);
       
-      let targetSessionId = currentSessionId;
-      if (!targetSessionId && onEnsureSessionCallback) {
-        targetSessionId = await onEnsureSessionCallback();
-        currentSessionId = targetSessionId;
+      try {
+        let targetSessionId = currentSessionId;
+        if (!targetSessionId && onEnsureSessionCallback) {
+          targetSessionId = await onEnsureSessionCallback();
+          currentSessionId = targetSessionId;
+        }
+
+        if (!targetSessionId || !currentSelectionData) {
+          console.log('[ContextCopilot] Tooltip save aborted: Missing sessionId or selectionData');
+          return;
+        }
+
+        const itemData = {
+          tag: tagStr.toLowerCase(),
+          content: currentSelectionData.text,
+          source: 'selection',
+          selection_context: {
+            selector_hint: currentSelectionData.selectorHint,
+          },
+        };
+
+        console.log('[ContextCopilot] Tooltip attempting to save:', itemData);
+
+        // Await the item creation so we can catch any limit errors together
+        await addItem(targetSessionId, itemData);
+        console.log('[ContextCopilot] Tooltip save successful!');
+        hideTooltip(); // SPEC-8: Dismiss after save
+      } catch (err) {
+        console.error('[ContextCopilot] Tooltip save failed:', err);
+        hideTooltip(); // Still dismiss tooltip
       }
-
-      if (!targetSessionId || !currentSelectionData) {
-        console.log('[ContextCopilot] Tooltip save aborted: Missing sessionId or selectionData', { currentSessionId, currentSelectionData });
-        return;
-      }
-
-      const itemData = {
-        tag: tagStr.toLowerCase(),
-        content: currentSelectionData.text,
-        source: 'selection',
-        selection_context: {
-          selector_hint: currentSelectionData.selectorHint,
-        },
-      };
-
-      console.log('[ContextCopilot] Tooltip attempting to save:', itemData);
-
-      // Fire and forget (optimistic save)
-      addItem(targetSessionId, itemData)
-        .then(() => console.log('[ContextCopilot] Tooltip save successful!'))
-        .catch(err => {
-          console.error('[ContextCopilot] Tooltip save failed:', err);
-          if (err?.message?.includes('Free tier is limited')) {
-            const sidebarHost = document.querySelector('#cc-sidebar-host');
-            const container = sidebarHost?.shadowRoot?.querySelector('.cc-sidebar') || document.body;
-            openProModal(container, err.message);
-          }
-        });
-        
-      hideTooltip(); // SPEC-8: Dismiss after save
     });
     container.appendChild(btn);
   });

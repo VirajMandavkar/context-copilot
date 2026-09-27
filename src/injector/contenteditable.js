@@ -25,23 +25,16 @@ export async function injectContentEditable(el, text) {
   const success = document.execCommand('insertText', false, text);
 
   if (!success) {
-    // Fallback: dispatch InputEvents directly (SPEC-18 fallback)
-    // For browsers where execCommand is fully deprecated
+    // Fallback: simulate a paste event. ProseMirror and Slate (Claude/Gemini) 
+    // handle paste events natively and will insert the text correctly.
+    const dataTransfer = new DataTransfer();
+    dataTransfer.setData('text/plain', text);
+    
     el.dispatchEvent(
-      new InputEvent('beforeinput', {
+      new ClipboardEvent('paste', {
+        clipboardData: dataTransfer,
         bubbles: true,
         cancelable: true,
-        inputType: 'insertText',
-        data: text,
-      })
-    );
-
-    el.dispatchEvent(
-      new InputEvent('input', {
-        bubbles: true,
-        cancelable: false,
-        inputType: 'insertText',
-        data: text,
       })
     );
   }

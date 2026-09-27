@@ -2,8 +2,6 @@
 // Implements: SPEC-12 (rendering), SPEC-12b (filtering), card expansion, optional titles, user-named grouping, drag-and-drop
 
 import { editItem, deleteItem, toggleTaskCompletion, reorderItem } from '../storage/engine.js';
-import { isGroupingAllowedSync } from '../license/guard.js';
-import { openProModal } from './pro-modal.js';
 
 let currentFilter = '';
 let activeTagFilter = 'all';
@@ -203,10 +201,6 @@ export function renderItemList(container, sessionState) {
       const section = itemEl.closest('.cc-accordion-section');
       const targetGroup = section ? section.dataset.group : (item.group || '');
 
-      if (targetGroup && targetGroup.toLowerCase() !== 'ungrouped' && !isGroupingAllowedSync()) {
-        openProModal(container.closest('.cc-sidebar') || container, 'User-Named Grouping is a Pro feature. Upgrade to Pro to organize notes into groups.');
-        return;
-      }
 
       await reorderItem(sessionState.session_id, {
         sourceId,
@@ -477,10 +471,6 @@ export function renderItemList(container, sessionState) {
         const newTitle = titleInput.value.trim();
         const newGroup = groupSelect.value.trim();
 
-        if (newGroup && newGroup.toLowerCase() !== 'ungrouped' && !isGroupingAllowedSync()) {
-          openProModal(container.closest('.cc-sidebar') || container, 'User-Named Grouping is a Pro feature. Upgrade to Pro to organize notes into groups.');
-          return;
-        }
 
         if (newContent) {
           // Exit edit mode immediately
@@ -704,10 +694,7 @@ export function renderItemList(container, sessionState) {
         e.stopPropagation();
         section.classList.remove('cc-drag-over');
 
-        if (grp.key !== 'ungrouped' && !isGroupingAllowedSync()) {
-          openProModal(container.closest('.cc-sidebar') || container, 'User-Named Grouping is a Pro feature. Upgrade to Pro to organize notes into groups.');
-          return;
-        }
+
 
         const sourceId = e.dataTransfer.getData('text/plain');
         if (!sourceId) return;

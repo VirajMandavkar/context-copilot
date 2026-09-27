@@ -6,7 +6,7 @@ async function safeSendMessage(tabId, message) {
   try {
     await chrome.tabs.sendMessage(tabId, message);
   } catch (err) {
-    console.log(`Could not send message to tab ${tabId}. Is it a valid webpage?`, err);
+    console.log('Could not send message to tab', tabId, 'Is it a valid webpage?', err);
   }
 }
 
@@ -47,3 +47,5 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
   }
 });
+
+

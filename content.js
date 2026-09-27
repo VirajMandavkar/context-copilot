@@ -2,7 +2,7 @@
 // Implements: SPEC-5, SPEC-6, SPEC-11, T-20 (Wiring)
 
 import { startNavigationTracker } from './src/storage/navigation.js';
-import { getSessionForThread, createAndLinkSessionForThread, getSessionState, clearSessionItems, createGroup, renameGroup, deleteGroup } from './src/storage/engine.js';
+import { getSessionIndex, getSessionForThread, createAndLinkSessionForThread, getSessionState, clearSessionItems, createGroup, renameGroup, deleteGroup } from './src/storage/engine.js';
 import { startStorageReactivity, stopStorageReactivity } from './src/storage/reactivity.js';
 import { initTooltip, destroyTooltip } from './src/tooltip/tooltip.js';
 import { toggleSidebar, closeSidebar, isSidebarOpen, getSidebarElements, onSidebarToggle } from './src/sidebar/sidebar.js';
@@ -16,8 +16,7 @@ import { compileContext } from './src/injector/compiler.js';
 import { findInputElement } from './src/injector/detector.js';
 import { injectTextarea } from './src/injector/textarea.js';
 import { injectContentEditable } from './src/injector/contenteditable.js';
-import { canUseGrouping } from './src/license/guard.js';
-import { openProModal } from './src/sidebar/pro-modal.js';
+
 
 let currentThreadId = null;
 let currentSessionId = null;
@@ -155,6 +154,7 @@ function syncEdgeHandleState(state, { allowPulse = false } = {}) {
 
 async function ensureSession() {
   if (!currentSessionId) {
+
     const thread = currentThreadId || ('thread-' + Date.now().toString(36));
     const initData = await createAndLinkSessionForThread(thread, window.location.href);
     currentSessionId = initData.sessionId;
@@ -175,6 +175,8 @@ async function ensureSession() {
 
 // Initialize the extension in the current context
 async function boot() {
+
+
   // Initialize floating edge pull-handle
   initEdgeHandle({
     onToggle: () => {
@@ -484,7 +486,7 @@ function wireSidebar(threadId, sessionId) {
       newInjectBtn.style.background = '#2e7d32';
       setTimeout(() => {
         newInjectBtn.textContent = originalText;
-        newInjectBtn.style.background = '#007acc';
+        newInjectBtn.style.background = '#36d6b5';
       }, 1500);
     });
   }
@@ -508,3 +510,14 @@ boot().catch((err) => {
   if (err?.message?.includes('Extension context invalidated')) return;
   console.log('[ContextCopilot] Boot error:', err);
 });
+
+// Periodic heartbeat to detect extension updates and clean up orphaned UI
+const cleanupInterval = setInterval(() => {
+  if (!chrome.runtime?.id) {
+    clearInterval(cleanupInterval);
+    console.log('[ContextCopilot] Extension context invalidated. Cleaning up UI...');
+    document.getElementById('cc-sidebar-host')?.remove();
+    document.getElementById('cc-edge-handle-host')?.remove();
+    document.getElementById('cc-tooltip-host')?.remove();
+  }
+}, 2000);
