@@ -253,31 +253,28 @@ function wireSidebar(threadId, sessionId) {
   if (elements.copyBtn) {
     const newCopyBtn = elements.copyBtn.cloneNode(true);
     elements.copyBtn.parentNode.replaceChild(newCopyBtn, elements.copyBtn);
-    newCopyBtn.addEventListener('click', (e) => {
+    newCopyBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       if (!currentSessionState) return;
 
-      // Yield to let the button click animation run immediately
-      setTimeout(async () => {
-        const tagFilter = getActiveTagFilter();
-        const groupFilter = getActiveGroupFilter();
-        const checkedGroups = getCheckedGroups();
-        const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter, checkedGroups });
-        if (!markdown) return;
+      const tagFilter = getActiveTagFilter();
+      const groupFilter = getActiveGroupFilter();
+      const checkedGroups = getCheckedGroups();
+      const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter, checkedGroups });
+      if (!markdown) return;
 
-        try {
-          await navigator.clipboard.writeText(markdown);
-          const originalText = newCopyBtn.textContent;
-          newCopyBtn.textContent = '✓ Copied!';
-          newCopyBtn.style.color = '#a3be8c';
-          setTimeout(() => {
-            newCopyBtn.textContent = originalText;
-            newCopyBtn.style.color = '#fff';
-          }, 1500);
-        } catch (err) {
-          console.error('Context Copilot: Failed to copy to clipboard', err);
-        }
-      }, 10);
+      try {
+        await navigator.clipboard.writeText(markdown);
+        const originalText = newCopyBtn.textContent;
+        newCopyBtn.textContent = '✓ Copied!';
+        newCopyBtn.style.color = '#a3be8c';
+        setTimeout(() => {
+          newCopyBtn.textContent = originalText;
+          newCopyBtn.style.color = '#fff';
+        }, 1500);
+      } catch (err) {
+        console.error('Context Copilot: Failed to copy to clipboard', err);
+      }
     });
   }
 
@@ -457,37 +454,35 @@ function wireSidebar(threadId, sessionId) {
   if (elements.injectBtn) {
     const newInjectBtn = elements.injectBtn.cloneNode(true);
     elements.injectBtn.parentNode.replaceChild(newInjectBtn, elements.injectBtn);
-    newInjectBtn.addEventListener('click', (e) => {
+    newInjectBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       if (!currentSessionState) return;
 
-      setTimeout(async () => {
-        const tagFilter = getActiveTagFilter();
-        const groupFilter = getActiveGroupFilter();
-        const checkedGroups = getCheckedGroups();
-        const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter, checkedGroups });
-        if (!markdown) return;
+      const tagFilter = getActiveTagFilter();
+      const groupFilter = getActiveGroupFilter();
+      const checkedGroups = getCheckedGroups();
+      const markdown = compileContext(currentSessionState, { tag: tagFilter, group: groupFilter, checkedGroups });
+      if (!markdown) return;
 
-        const inputEl = findInputElement();
-        if (!inputEl) {
-          console.log('Context Copilot: No suitable input element found.');
-          return;
-        }
+      const inputEl = findInputElement();
+      if (!inputEl) {
+        console.log('Context Copilot: No suitable input element found.');
+        return;
+      }
 
-        if (inputEl.tagName === 'TEXTAREA') {
-          await injectTextarea(inputEl, markdown);
-        } else {
-          await injectContentEditable(inputEl, markdown);
-        }
+      if (inputEl.tagName === 'TEXTAREA') {
+        await injectTextarea(inputEl, markdown);
+      } else {
+        await injectContentEditable(inputEl, markdown);
+      }
 
-        const originalText = newInjectBtn.textContent;
-        newInjectBtn.textContent = '✓ Injected!';
-        newInjectBtn.style.background = '#2e7d32';
-        setTimeout(() => {
-          newInjectBtn.textContent = originalText;
-          newInjectBtn.style.background = '#36d6b5';
-        }, 1500);
-      }, 10);
+      const originalText = newInjectBtn.textContent;
+      newInjectBtn.textContent = '✓ Injected!';
+      newInjectBtn.style.background = '#2e7d32';
+      setTimeout(() => {
+        newInjectBtn.textContent = originalText;
+        newInjectBtn.style.background = '#36d6b5';
+      }, 1500);
     });
   }
 
