@@ -116,10 +116,9 @@ function showTooltip(range, text) {
     style.textContent = TOOLTIP_CSS;
     shadowRoot.appendChild(style);
     
-    // Prevent mousedown/mouseup/click inside the entire host from bubbling up to document
-    ['click', 'mousedown', 'mouseup', 'keydown', 'keyup'].forEach(evt => {
-      hostElement.addEventListener(evt, (e) => e.stopPropagation());
-    });
+    // Prevent mousedown/mouseup inside the entire host from bubbling up to document
+    hostElement.addEventListener('mousedown', (e) => e.stopPropagation());
+    hostElement.addEventListener('mouseup', (e) => e.stopPropagation());
     
     document.body.appendChild(hostElement);
   }

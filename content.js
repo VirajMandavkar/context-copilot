@@ -254,7 +254,6 @@ function wireSidebar(threadId, sessionId) {
     const newCopyBtn = elements.copyBtn.cloneNode(true);
     elements.copyBtn.parentNode.replaceChild(newCopyBtn, elements.copyBtn);
     newCopyBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
       if (!currentSessionState) return;
 
       const tagFilter = getActiveTagFilter();
@@ -455,7 +454,6 @@ function wireSidebar(threadId, sessionId) {
     const newInjectBtn = elements.injectBtn.cloneNode(true);
     elements.injectBtn.parentNode.replaceChild(newInjectBtn, elements.injectBtn);
     newInjectBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
       if (!currentSessionState) return;
 
       const tagFilter = getActiveTagFilter();
